@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1> {{ budget.budget_name }} </h1>
+    <p>{{ budget.allowed_spending }} / {{ budget.spent }}</p>
+    <lu>
+    {%for transaction in budget.transaction_set.all %}
+        <li> {{ transaction.value }} </li>
+    {% endfor %}
+    </lu>
+{% endblock content %}

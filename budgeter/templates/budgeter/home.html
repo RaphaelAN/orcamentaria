@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1> {{ user.username }} </h1>
+    <p>{{ user_spent_budget }} / {{ user.total_budget }}</p>
+    <lu>
+    {%for budget in user.budget_set.all %}
+        <li>
+            <a href={% url 'budget' budget.id %}>
+                <h3>{{ budget.budget_name }}</h3>
+            </a>
+            <p>{{ budget.spent }} / {{ budget.allowed_spending }}</p>
+        </li>
+    {% endfor %}
+    </lu>
+{% endblock content %}
