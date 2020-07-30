@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+    <nav class="navbar sticky-top navbar-dark bg-dark">
+
+        <a class="navbar-brand" href={% url 'home' %}>Home</a>
+        <a class="navbar-brand" href={% url 'transaction_history' %}>Histórico de Gastos</a>
+        <a class="navbar-brand" href={% url 'logout' %}> Sair </a>
+    </nav>
+
+    {% block main %}{% endblock %}
+{% endblock content %}

@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.db.models import signals, Sum
 from django.contrib.auth.models import AbstractUser
 from django.dispatch import receiver
+from decimal import Decimal
 
 # Base budget used to aggregate transactions without a user specified budget
 BASE_BUDGET_NAME = "Outros Gastos"
@@ -27,7 +28,7 @@ class User(AbstractUser):
         spent_budget = self.transaction_set.all().aggregate(Sum('value'))['value__sum']
 
         if spent_budget is None:
-            return 0.0
+            return Decimal('0.00')
 
         return spent_budget
 
@@ -42,6 +43,14 @@ class Budget(models.Model):
     spent = models.DecimalField(default=0, decimal_places=2, max_digits=15)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    def get_spent_budget(self):
+        spent_budget = self.transaction_set.all().aggregate(Sum('value'))['value__sum']
+
+        if spent_budget is None:
+            return Decimal('0.00')
+
+        return spent_budget
 
     def __str__(self):
         return self.budget_name

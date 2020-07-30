@@ -1,0 +1,11 @@
+{% extends 'budgeter/budgeter_base.html' %}
+{% block main %}
+    <h1> Transações </h1>
+    <lu>
+        {%for transaction in transaction_history %}
+            <li>
+                <p> {{ transaction.value }}</p>
+            </li>
+        {% endfor %}
+    </lu>
+{% endblock main %}

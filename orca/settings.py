@@ -24,6 +24,9 @@ SECRET_KEY = '46asf%c)5e5=fh=&hg)5!7wsyofuv6md^^nro5q2n7$m-4et7i'
 
 AUTH_USER_MODEL = 'budgeter.User'
 
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 

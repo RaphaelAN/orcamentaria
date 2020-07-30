@@ -1,5 +1,5 @@
-{% extends 'base.html' %}
-{% block content %}
+{% extends 'budgeter/budgeter_base.html' %}
+{% block main %}
     <h1> {{ user.username }} </h1>
     <p>{{ user_spent_budget }} / {{ user.total_budget }}</p>
     <lu>
@@ -8,8 +8,8 @@
             <a href={% url 'budget' budget.id %}>
                 <h3>{{ budget.budget_name }}</h3>
             </a>
-            <p>{{ budget.spent }} / {{ budget.allowed_spending }}</p>
+            <p>{{ budget.get_spent_budget }} / {{ budget.allowed_spending }}</p>
         </li>
     {% endfor %}
     </lu>
-{% endblock content %}
+{% endblock main %}
