@@ -1,34 +1,28 @@
 {% extends "base.html" %}
-
+{% load crispy_forms_tags %}
 {% block content %}
-
-  {% if form.errors %}
-    <p>Your username and password didn't match. Please try again.</p>
-  {% endif %}
-
-  {% if next %}
-    {% if user.is_authenticated %}
-      <p>Your account doesn't have access to this page. To proceed,
-      please login with an account that has access.</p>
-    {% else %}
-      <p>Please login to see this page.</p>
-    {% endif %}
-  {% endif %}
-
-  <form method="post" action="{% url 'login' %}">
-    {% csrf_token %}
-    <table>
-      <tr>
-        <td>{{ form.username.label_tag }}</td>
-        <td>{{ form.username }}</td>
-      </tr>
-      <tr>
-        <td>{{ form.password.label_tag }}</td>
-        <td>{{ form.password }}</td>
-      </tr>
-    </table>
-    <input type="submit" value="login" />
-    <input type="hidden" name="next" value="{{ next }}" />
-  </form>
-
+    <div class="row">
+      <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
+        <div class="card card-signin my-5">
+          <div class="card-body">
+            <h5 class="card-title text-center">Orçamentaria</h5>
+              {% block form %}
+                <form method="post" action="{% url 'login' %}">
+                {% csrf_token %}
+                <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Log In</legend>
+                    {{ form|crispy }}
+                </fieldset>
+                <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Sign in</button>
+                </form>
+                  <div class="border-top pt-3">
+                    <small class="text-muted">
+                        Precisa de uma conta? <a class="ml-2" href="{% url 'register' %}">Crie aqui!</a>
+                    </small>
+                  </div>
+              {% endblock form %}
+          </div>
+        </div>
+      </div>
+    </div>
   {% endblock content %}

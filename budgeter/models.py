@@ -4,22 +4,18 @@ from django.db.models import signals, Sum
 from django.contrib.auth.models import AbstractUser
 from django.dispatch import receiver
 from decimal import Decimal
+import datetime
+from dateutil.relativedelta import relativedelta
 
 # Base budget used to aggregate transactions without a user specified budget
 BASE_BUDGET_NAME = "Outros Gastos"
 
 
 class User(AbstractUser):
-    total_budget = models.DecimalField(decimal_places=2, max_digits=15, default=0)
+    BUDGET_START_DAY_OPTIONS = [(x, str(x)) for x in range(1, 29)]
 
-    # TODO change save to signal
-    """
-    def save(self, *args, **kwargs):
-        created = not self.pk
-        super().save(*args, **kwargs)
-        if created:
-            Budget.objects.create(user=self, budget_name=BASE_BUDGET_NAME, allowed_spending=self.total_budget)
-    """
+    total_budget = models.DecimalField(decimal_places=2, max_digits=15, default=0)
+    budget_start_day = models.IntegerField(choices=BUDGET_START_DAY_OPTIONS, default=1)
 
     def get_base_budget(self):
         return self.budget_set.get(budget_name=BASE_BUDGET_NAME)
@@ -32,6 +28,11 @@ class User(AbstractUser):
 
         return spent_budget
 
+    def get_budget_cutoff_date(self):
+        today = timezone.now()
+        cutoff_date = datetime.datetime(today.year, today.month, self.budget_start_day) - relativedelta(months=1)
+        return cutoff_date
+
     def __str__(self):
         return self.username
 
@@ -43,7 +44,7 @@ class Budget(models.Model):
     spent = models.DecimalField(default=0, decimal_places=2, max_digits=15)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     def get_spent_budget(self):
         spent_budget = self.transaction_set.all().aggregate(Sum('value'))['value__sum']
 
@@ -59,6 +60,7 @@ class Budget(models.Model):
 class Transaction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     budget = models.ForeignKey(Budget, on_delete=models.CASCADE)
+    title = models.CharField(max_length=200)
     value = models.DecimalField(decimal_places=2, max_digits=15)
     date = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(auto_now_add=True)
