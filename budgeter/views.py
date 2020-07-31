@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.utils import timezone
 from django.urls import reverse
 
-from .forms import UserRegisterForm, TransactionCreationForm
+from .forms import *
 from .models import Transaction, User, Budget
 
 
@@ -49,13 +49,31 @@ class TransactionHistoryView(LoginRequiredMixin, generic.ListView):
 
 
 @login_required()
-def create_transaction(request):
+def create_budget(request):
     if request.method == 'POST':
-        form = TransactionCreationForm(request.POST, user=request.user)
+        form = BudgetCreationForm(request.POST)
         if form.is_valid():
-            form.save()
+            new_budget = form.save(commit=False)
+            new_budget.user = request.user
+            new_budget.save()
             return redirect(reverse('home'))
     else:
-        form = TransactionCreationForm()
-    return render(request, 'budgeter/create_transaction.html')
+        form = BudgetCreationForm()
+    return render(request, 'budgeter/create_budget.html', {'form': form})
+
+
+@login_required()
+def create_transaction(request):
+    if request.method == 'POST':
+        form = TransactionCreationForm(request.POST, request=request)
+        if form.is_valid():
+            new_transaction = form.save(commit=False)
+            new_transaction.user = request.user
+            budget = form.cleaned_data['budget']
+            new_transaction.budget = budget
+            new_transaction.save()
+            return redirect(reverse('home'))
+    else:
+        form = TransactionCreationForm(request=request)
+    return render(request, 'budgeter/create_transaction.html', {'form': form})
 
