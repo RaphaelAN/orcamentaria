@@ -1,10 +1,28 @@
 {% extends 'budgeter/budgeter_base.html' %}
 {% block main %}
-    <h1> {{ budget.budget_name }} </h1>
-    <p>{{ budget.get_spent_budget }} / {{ budget.allowed_spending }}</p>
-    <lu>
-    {%for transaction in budget.transaction_set.all %}
-        <li> {{ transaction.value }} </li>
-    {% endfor %}
-    </lu>
+    <div class="card my-2" style="background-color: #ECFDF1">
+        <div class="card-body">
+            <h3 class="card-title">{{ budget.budget_name }}</h3>
+
+            <p>{{ budget.get_spent_budget }} / {{ budget.allowed_spending }}</p>
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" style="width: {{ budget.get_spent_percentage }}%">
+                    {{ budget.get_spent_percentage }}%
+                </div>
+            </div>
+        </div>
+        <table class="table">
+            {%for transaction in budget.transaction_set.all%}
+                <tr>
+                    <th> {{ transaction.title }}</th>
+                    <th> {{ transaction.value }}</th>
+                    <th>
+                        <a class="btn btn-outline-success btn-sm" href="#"/> Editar</a>
+                        <a class="btn btn-outline-danger btn-sm" href="{% url 'delete_transaction' transaction.id %}"/> Excluir</a>
+                    </th>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
 {% endblock main %}

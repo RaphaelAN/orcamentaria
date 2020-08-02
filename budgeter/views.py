@@ -4,7 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 
 from .forms import *
 from .models import Transaction, User, Budget
@@ -51,10 +51,13 @@ class TransactionHistoryView(LoginRequiredMixin, generic.ListView):
 @login_required()
 def create_budget(request):
     if request.method == 'POST':
-        form = BudgetCreationForm(request.POST)
+        form = BudgetCreationForm(request.POST, request=request)
         if form.is_valid():
             new_budget = form.save(commit=False)
             new_budget.user = request.user
+            base_budget = request.user.get_base_budget()
+            base_budget.allowed_spending -= new_budget.allowed_spending
+            base_budget.save()
             new_budget.save()
             return redirect(reverse('home'))
     else:
@@ -76,4 +79,9 @@ def create_transaction(request):
     else:
         form = TransactionCreationForm(request=request)
     return render(request, 'budgeter/create_transaction.html', {'form': form})
+
+
+class DeleteTransaction(LoginRequiredMixin, generic.DeleteView):
+    model = Transaction
+    success_url = reverse_lazy('transaction_history')
 

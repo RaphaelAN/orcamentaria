@@ -20,6 +20,13 @@ class User(AbstractUser):
     def get_base_budget(self):
         return self.budget_set.get(budget_name=BASE_BUDGET_NAME)
 
+    def get_allocated_budget(self):
+        allocated_budget = self.budget_set.all().aggregate(Sum('allowed_spending'))['allowed_spending__sum']
+
+        # exclude base budget allowed_spending as it's not allocated yet
+        allocated_budget -= self.get_base_budget().allowed_spending
+        return allocated_budget
+
     def get_spent_budget(self):
         spent_budget = self.transaction_set.all().aggregate(Sum('value'))['value__sum']
 
@@ -27,6 +34,15 @@ class User(AbstractUser):
             return Decimal('0.00')
 
         return spent_budget
+
+    def get_spent_percentage(self):
+        spent_budget = self.get_spent_budget()
+        if spent_budget == 0 or self.total_budget == 0:
+            return 0
+        percentage = int((spent_budget/self.total_budget) * 100)
+        if percentage > 100:
+            return 100
+        return percentage
 
     def get_budget_cutoff_date(self):
         today = timezone.now()
@@ -52,6 +68,15 @@ class Budget(models.Model):
             return Decimal('0.00')
 
         return spent_budget
+
+    def get_spent_percentage(self):
+        spent_budget = self.get_spent_budget()
+        if spent_budget == 0 or self.allowed_spending == 0:
+            return 0
+        percentage = int((spent_budget/self.allowed_spending) * 100)
+        if percentage > 100:
+            return 100
+        return percentage
 
     def __str__(self):
         return self.budget_name

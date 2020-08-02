@@ -1,6 +1,5 @@
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
-from django.forms import ModelForm, ModelChoiceField
-
+from django.forms import ModelForm, ModelChoiceField, ValidationError, DateTimeField, SelectDateWidget
 from .models import User, Transaction, Budget
 
 
@@ -21,9 +20,22 @@ class BudgetCreationForm(ModelForm):
         model = Budget
         fields = ('budget_name', 'allowed_spending')
 
+    def __init__(self, *args, **kwargs):
+        request = kwargs.pop('request', None)
+        super().__init__(*args, **kwargs)
+        self.request = request
+
+    def clean_allowed_spending(self):
+        unallocated_budget = self.request.user.get_base_budget().allowed_spending
+        allowed_spending = self.cleaned_data.get('allowed_spending')
+        if allowed_spending > unallocated_budget:
+            raise ValidationError('Valor do novo orçamento excede seu orçamento mensal.')
+        return allowed_spending
+
 
 class TransactionCreationForm(ModelForm):
     budget = ModelChoiceField(label="Orçamento", queryset=None)
+    date = DateTimeField(label='Data', widget=SelectDateWidget)
 
     def __init__(self, *args, **kwargs):
         request = kwargs.pop('request', None)
@@ -34,4 +46,4 @@ class TransactionCreationForm(ModelForm):
 
     class Meta:
         model = Transaction
-        fields = ('title', 'value', 'date')
+        fields = ('title', 'value',)

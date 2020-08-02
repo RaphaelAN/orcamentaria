@@ -1,0 +1,12 @@
+{% extends 'budgeter/budgeter_base.html' %}
+{% block main %}
+    <div class="row">
+      <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
+        <div class="card card-signin my-5" style="background-color: #ECFDF1">
+          <div class="card-body">
+              {% block form %}{% endblock %}
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endblock main %}

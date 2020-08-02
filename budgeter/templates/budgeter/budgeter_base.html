@@ -1,13 +1,28 @@
 {% extends 'base.html' %}
 {% block content %}
-    <nav class="navbar sticky-top navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-md sticky-top navbar-light" style="background-color: #ECFDF1">
+        <a class="navbar-brand" href={% url 'home' %}>Orçamentaria</a>
 
-        <a class="navbar-brand" href={% url 'home' %}>Home</a>
-        <a class="navbar-brand" href={% url 'transaction_history' %}>Histórico de Gastos</a>
-        <a class="navbar-brand" href={% url 'create_transaction' %}>Criar Novo Gasto</a>
-        <a class="navbar-brand" href={% url 'create_budget' %}>Criar Novo Orçamento</a>
-        <a class="navbar-brand" href={% url 'logout' %}> Sair </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href={% url 'transaction_history' %}>Histórico</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href={% url 'create_transaction' %}>Novo Gasto</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href={% url 'create_budget' %}>Novo Orçamento</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href={% url 'logout' %}> Sair </a>
+                </li>
+            </ul>
+        </div>
     </nav>
-
     {% block main %}{% endblock %}
 {% endblock content %}

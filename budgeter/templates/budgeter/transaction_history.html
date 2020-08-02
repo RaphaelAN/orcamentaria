@@ -1,12 +1,20 @@
 {% extends 'budgeter/budgeter_base.html' %}
 {% block main %}
-    <h1> Transações </h1>
-    <table class="table">
-        {%for transaction in transaction_history %}
-            <tr>
-                <th> {{ transaction.title }}</th>
-                <th> {{ transaction.value }}</th>
-            </tr>
-        {% endfor %}
-    </table>
+     <div class="card my-2" style="background-color: #ECFDF1">
+        <div class="card-body">
+            <h1 class="card-title"> Despesas </h1>
+                <table class="table">
+                    {%for transaction in transaction_history %}
+                        <tr>
+                            <th> {{ transaction.title }}</th>
+                            <th> {{ transaction.value }}</th>
+                            <th>
+                                <a class="btn btn-outline-success btn-sm" href="#"/> Editar</a>
+                                <a class="btn btn-outline-danger btn-sm" href="{% url 'delete_transaction' transaction.id %}"/> Excluir</a>
+                            </th>
+                        </tr>
+                    {% endfor %}
+                </table>
+        </div>
+     </div>
 {% endblock main %}
