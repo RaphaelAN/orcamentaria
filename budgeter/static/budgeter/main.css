@@ -1,0 +1,13 @@
+body{
+    background-color: #F9EAC2;
+}
+
+.card{
+    background-color: #ECFDF1;
+    box-shadow: 0 1px 20px 0 rgba(0,0,0,.1);
+}
+
+a.custom-card,
+a.custom-card:hover {
+  color: inherit;
+}

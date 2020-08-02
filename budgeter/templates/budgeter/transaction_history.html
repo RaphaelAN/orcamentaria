@@ -1,12 +1,12 @@
 {% extends 'budgeter/budgeter_base.html' %}
 {% block main %}
-     <div class="card my-2" style="background-color: #ECFDF1">
+     <div class="card my-2">
         <div class="card-body">
             <h1 class="card-title"> Despesas </h1>
                 <table class="table">
                     {%for transaction in transaction_history %}
                         <tr>
-                            <th> {{ transaction.title }}</th>
+                            <th> {{ transaction.title| title }}</th>
                             <th> {{ transaction.value }}</th>
                             <th>
                                 <a class="btn btn-outline-success btn-sm" href="#"/> Editar</a>

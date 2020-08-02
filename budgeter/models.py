@@ -94,13 +94,22 @@ class Transaction(models.Model):
 
 @receiver(signals.post_save, sender=User)
 def create_base_budget(sender, instance, **kwargs):
-    Budget.objects.get_or_create(user=instance, budget_name=BASE_BUDGET_NAME, allowed_spending=instance.total_budget)
+    try:
+        instance.get_base_budget()
+    except:
+        allowed_spending = instance.total_budget - instance.get_allocated_budget()
+        Budget.objects.create(user=instance, budget_name=BASE_BUDGET_NAME, allowed_spending=allowed_spending)
 
 
 @receiver(signals.pre_delete, sender=Budget)
 def point_transaction_to_base_budget(sender, instance, **kwargs):
     budget_transactions = instance.transaction_set.all()
-    base_budget = instance.user.get_base_budget()
+    try:
+        base_budget = instance.get_base_budget()
+    except:
+        allowed_spending = instance.total_budget - instance.get_allocated_budget()
+        base_budget = Budget.objects.create(user=instance, budget_name=BASE_BUDGET_NAME,
+                                            allowed_spending=allowed_spending)
     for transaction in budget_transactions:
         transaction.budget = base_budget
         transaction.save()

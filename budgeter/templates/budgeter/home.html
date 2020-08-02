@@ -1,8 +1,8 @@
 {% extends 'budgeter/budgeter_base.html' %}
 {% block main %}
-    <div class="card my-2" style="background-color: #ECFDF1">
+    <div class="card my-2">
         <div class="card-body">
-            <h1 class="card-title"> {{ user.username }} </h1>
+            <h1 class="card-title"> {{ user.username| title }} </h1>
             <div>
                 <p>{{ user_spent_budget }} / {{ user.total_budget }}</p>
                 <div class="progress">
@@ -16,20 +16,19 @@
 
     <div class="card-deck">
     {%for budget in user.budget_set.all %}
-        <div class="card" style="background-color: #ECFDF1">
-            <div class="card-body">
-                <a href={% url 'budget' budget.id %}>
-                <h3 class="card-title">{{ budget.budget_name }}</h3>
-                </a>
-
-                <p>{{ budget.get_spent_budget }} / {{ budget.allowed_spending }}</p>
-                <div class="progress">
-                    <div class="progress-bar" role="progressbar" style="width: {{ budget.get_spent_percentage }}%">
-                        {{ budget.get_spent_percentage }}%
+        <a class="custom-card" href={% url 'budget' budget.id %}>
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title">{{ budget.budget_name| title }}</h3>
+                    <p>{{ budget.get_spent_budget }} / {{ budget.allowed_spending }}</p>
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar" style="width: {{ budget.get_spent_percentage }}%">
+                            {{ budget.get_spent_percentage }}%
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </a>
     {% endfor %}
     </div>
 {% endblock main %}
