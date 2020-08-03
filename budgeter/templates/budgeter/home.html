@@ -19,7 +19,7 @@
     <div class="card-deck">
     {%for budget in user.budget_set.all %}
         <a class="custom-card" href={% url 'budget' budget.id %}>
-            <div class="card" style="border-color: {{ budget.budget_color }}">
+            <div class="card">
                 <div class="card-body">
                     <h3 class="card-title">{{ budget.budget_name| title }}</h3>
                     <p>{{ budget.get_spent_budget }} / {{ budget.allowed_spending }}</p>

@@ -3,7 +3,6 @@ from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from colorfield import widgets
 from django.urls import reverse, reverse_lazy
 
 from .forms import *

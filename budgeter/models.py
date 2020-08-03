@@ -118,7 +118,7 @@ def update_base_budget(sender, instance, **kwargs):
 
 
 @receiver(signals.post_save, sender=Budget)
-def update_base_budget(sender, instance, **kwargs):
+def update_base_budget_from_budget(sender, instance, **kwargs):
     user = instance.user
     base_budget = user.get_base_budget()
     if instance == base_budget:
