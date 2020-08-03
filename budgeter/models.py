@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.db.models import signals, Sum
 from django.contrib.auth.models import AbstractUser
 from django.dispatch import receiver
+from django.core.exceptions import ObjectDoesNotExist
 from decimal import Decimal
 import datetime
 from dateutil.relativedelta import relativedelta
@@ -14,11 +15,23 @@ BASE_BUDGET_NAME = "Outros Gastos"
 class User(AbstractUser):
     BUDGET_START_DAY_OPTIONS = [(x, str(x)) for x in range(1, 29)]
 
-    total_budget = models.DecimalField(decimal_places=2, max_digits=15, default=0)
-    budget_start_day = models.IntegerField(choices=BUDGET_START_DAY_OPTIONS, default=1)
+    total_budget = models.DecimalField(decimal_places=2, max_digits=15, default=0, verbose_name='Orçamento Total')
+    budget_start_day = models.IntegerField(choices=BUDGET_START_DAY_OPTIONS, default=1,
+                                           verbose_name='Dia de inicio do orçamento')
 
     def get_base_budget(self):
-        return self.budget_set.get(budget_name=BASE_BUDGET_NAME)
+        try:
+            base_budget = self.budget_set.get(budget_name=BASE_BUDGET_NAME)
+        except ObjectDoesNotExist:
+
+            # budget created with allowed_spending zero to avoid recursion in get_allocated_budget
+            base_budget = Budget.objects.create(user=self, budget_name=BASE_BUDGET_NAME,
+                                                allowed_spending=0)
+            allowed_spending = self.total_budget - self.get_allocated_budget()
+            base_budget.allowed_spending = allowed_spending
+            base_budget.save()
+
+        return base_budget
 
     def get_allocated_budget(self):
         allocated_budget = self.budget_set.all().aggregate(Sum('allowed_spending'))['allowed_spending__sum']
@@ -55,8 +68,8 @@ class User(AbstractUser):
 
 class Budget(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    budget_name = models.CharField(max_length=200)
-    allowed_spending = models.DecimalField(decimal_places=2, max_digits=15)
+    budget_name = models.CharField(max_length=200, verbose_name='Nome do Orçamento')
+    allowed_spending = models.DecimalField(decimal_places=2, max_digits=15,verbose_name='Valor')
     spent = models.DecimalField(default=0, decimal_places=2, max_digits=15)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -84,32 +97,40 @@ class Budget(models.Model):
 
 class Transaction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    budget = models.ForeignKey(Budget, on_delete=models.CASCADE)
-    title = models.CharField(max_length=200)
-    value = models.DecimalField(decimal_places=2, max_digits=15)
-    date = models.DateTimeField(default=timezone.now)
+    budget = models.ForeignKey(Budget, on_delete=models.CASCADE, verbose_name='Orçamento')
+    title = models.CharField(max_length=200, verbose_name='Despesa')
+    value = models.DecimalField(decimal_places=2, max_digits=15, verbose_name='Valor')
+    date = models.DateField(default=timezone.now, verbose_name='Data')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        ordering = ['-date']
+
 
 @receiver(signals.post_save, sender=User)
-def create_base_budget(sender, instance, **kwargs):
-    try:
-        instance.get_base_budget()
-    except:
-        allowed_spending = instance.total_budget - instance.get_allocated_budget()
-        Budget.objects.create(user=instance, budget_name=BASE_BUDGET_NAME, allowed_spending=allowed_spending)
+def update_base_budget(sender, instance, **kwargs):
+    base_budget = instance.get_base_budget()
+    base_budget.allowed_spending = instance.total_budget - instance.get_allocated_budget()
+    base_budget.save()
+
+
+@receiver(signals.post_save, sender=Budget)
+def update_base_budget(sender, instance, **kwargs):
+    user = instance.user
+    base_budget = user.get_base_budget()
+    if instance == base_budget:
+        return
+    base_budget.allowed_spending = user.total_budget - user.get_allocated_budget()
+    base_budget.save()
 
 
 @receiver(signals.pre_delete, sender=Budget)
 def point_transaction_to_base_budget(sender, instance, **kwargs):
     budget_transactions = instance.transaction_set.all()
-    try:
-        base_budget = instance.get_base_budget()
-    except:
-        allowed_spending = instance.total_budget - instance.get_allocated_budget()
-        base_budget = Budget.objects.create(user=instance, budget_name=BASE_BUDGET_NAME,
-                                            allowed_spending=allowed_spending)
+    base_budget = instance.user.get_base_budget()
+    base_budget.allowed_spending += instance.allowed_spending
+    base_budget.save()
     for transaction in budget_transactions:
         transaction.budget = base_budget
         transaction.save()

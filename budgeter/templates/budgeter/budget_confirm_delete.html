@@ -5,12 +5,12 @@
         <form method="POST">
             {% csrf_token %}
             <fieldset class="form-group">
-                <legend class="border-bottom mb-4">Deletar Despesa</legend>Gasto
-                <h2>Tem certeza que quer deletar a despesa: "{{ object.title }}"</h2>
+                <legend class="border-bottom mb-4">Deletar Orçamento</legend>
+                <h2>Tem certeza que quer deletar o orçamento: "{{ object.budget_name }}"</h2>
             </fieldset>
             <div class="form-group">
                 <button class="btn btn-outline-danger" type="submit">Sim</button>
-                <a class="btn btn-outline-secondary" href="{% url 'home' %}">Cancelar</a>
+                <a class="btn btn-outline-secondary" href="{% url 'budget' object.id %}">Cancelar</a>
             </div>
         </form>
     </div>

@@ -1,8 +1,21 @@
 {% extends 'budgeter/budgeter_base.html' %}
 {% block main %}
-    <div class="card my-2" style="background-color: #ECFDF1">
+    <div class="card my-2">
         <div class="card-body">
-            <h3 class="card-title">{{ budget.budget_name }}</h3>
+            <div class="card-title">
+                <h3>{{ budget.budget_name| title }}</h3>
+                {% if budget == budget.user.get_base_budget%}
+
+                {% else %}
+                    <a class="btn btn-outline-danger btn-sm float-right" href="{% url 'delete_budget' budget.id %}"/>
+                        Excluir
+                    </a>
+                    <a class="btn btn-outline-success btn-sm float-right mx-1"
+                       href="{% url 'budget_update' budget.id %}"/>
+                        Editar
+                    </a>
+                {% endif %}
+            </div>
 
             <p>{{ budget.get_spent_budget }} / {{ budget.allowed_spending }}</p>
             <div class="progress">
@@ -16,9 +29,10 @@
                 <tr>
                     <th> {{ transaction.title }}</th>
                     <th> {{ transaction.value }}</th>
+                    <th> {{ transaction.date }}</th>
                     <th>
-                        <a class="btn btn-outline-success btn-sm" href="#"/> Editar</a>
-                        <a class="btn btn-outline-danger btn-sm" href="{% url 'delete_transaction' transaction.id %}"/> Excluir</a>
+                        <a class="btn btn-outline-danger btn-sm"
+                           href="{% url 'delete_transaction' transaction.id %}"/> Excluir</a>
                     </th>
                 </tr>
             {% endfor %}

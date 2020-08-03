@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
@@ -23,6 +23,13 @@ def register(request):
     return render(request, 'registration/register.html', {'form': form})
 
 
+class UserUpdate(LoginRequiredMixin, generic.UpdateView):
+    model = User
+    fields = ['total_budget', 'budget_start_day']
+    template_name_suffix = '_update_form'
+    success_url = reverse_lazy('home')
+
+
 @login_required
 def home(request):
     user = request.user
@@ -45,7 +52,7 @@ class TransactionHistoryView(LoginRequiredMixin, generic.ListView):
     def get_queryset(self):
         user = self.request.user
         cutoff_date = user.get_budget_cutoff_date()
-        return user.transaction_set.filter(date__range=[cutoff_date, timezone.now()]).order_by('-date')
+        return user.transaction_set.all().order_by('-date')
 
 
 @login_required()
@@ -84,4 +91,36 @@ def create_transaction(request):
 class DeleteTransaction(LoginRequiredMixin, generic.DeleteView):
     model = Transaction
     success_url = reverse_lazy('transaction_history')
+
+
+class DeleteBudget(LoginRequiredMixin, generic.DeleteView):
+    model = Budget
+    success_url = reverse_lazy('home')
+
+
+class BudgetUpdate(LoginRequiredMixin, generic.UpdateView):
+    model = Budget
+    fields = ['budget_name', 'allowed_spending']
+    template_name_suffix = '_update_form'
+    success_url = reverse_lazy('home')
+
+
+@login_required()
+def transfer_budget(request):
+    if request.method == 'POST':
+        form = TransferBudgetForm(request.POST, request=request)
+        if form.is_valid():
+            value = form.cleaned_data['value']
+            from_budget = form.cleaned_data['from_budget']
+            to_budget = form.cleaned_data['to_budget']
+            from_budget.allowed_spending -= value
+            to_budget.allowed_spending += value
+            from_budget.save()
+            to_budget.save()
+            return redirect(reverse_lazy('home'))
+    else:
+        form = TransferBudgetForm(request=request)
+
+    return render(request, 'budgeter/transfer.html', {'form': form})
+
 

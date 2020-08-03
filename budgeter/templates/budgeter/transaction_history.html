@@ -3,18 +3,27 @@
      <div class="card my-2">
         <div class="card-body">
             <h1 class="card-title"> Despesas </h1>
-                <table class="table">
-                    {%for transaction in transaction_history %}
-                        <tr>
-                            <th> {{ transaction.title| title }}</th>
-                            <th> {{ transaction.value }}</th>
-                            <th>
-                                <a class="btn btn-outline-success btn-sm" href="#"/> Editar</a>
-                                <a class="btn btn-outline-danger btn-sm" href="{% url 'delete_transaction' transaction.id %}"/> Excluir</a>
-                            </th>
-                        </tr>
-                    {% endfor %}
-                </table>
+            <div>
+                <p>{{ user.get_spent_budget }} / {{ user.total_budget }}</p>
+                <div class="progress">
+                    <div class="progress-bar bg-info" role="progressbar" style="width: {{ user.get_spent_percentage }}%">
+                        {{ user.get_spent_percentage }}%
+                    </div>
+                </div>
+            </div>
+            <table class="table">
+                {%for transaction in transaction_history %}
+                    <tr>
+                        <th> {{ transaction.title| title }}</th>
+                        <th> {{ transaction.value }}</th>
+                        <th> {{ transaction.date }}</th>
+                        <th>
+                            <a class="btn btn-outline-danger btn-sm"
+                               href="{% url 'delete_transaction' transaction.id %}"/> Excluir</a>
+                        </th>
+                    </tr>
+                {% endfor %}
+            </table>
         </div>
      </div>
 {% endblock main %}
