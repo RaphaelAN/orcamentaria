@@ -10,7 +10,7 @@ import datetime
 from dateutil.relativedelta import relativedelta
 
 # Base budget used to aggregate transactions without a user specified budget
-BASE_BUDGET_NAME = "Outros Gastos"
+BASE_BUDGET_NAME = "Outras Despesas"
 
 
 class User(AbstractUser):
@@ -72,7 +72,7 @@ class Budget(models.Model):
     budget_name = models.CharField(max_length=200, verbose_name='Nome do Orçamento')
     allowed_spending = models.DecimalField(decimal_places=2, max_digits=15,verbose_name='Valor')
     spent = models.DecimalField(default=0, decimal_places=2, max_digits=15)
-    budget_color = ColorField(default='#FF0000')
+    budget_color = ColorField(default='#FF0000', verbose_name="Cor do Orçamento")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
