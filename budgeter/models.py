@@ -4,6 +4,7 @@ from django.db.models import signals, Sum
 from django.contrib.auth.models import AbstractUser
 from django.dispatch import receiver
 from django.core.exceptions import ObjectDoesNotExist
+from colorfield.fields import ColorField
 from decimal import Decimal
 import datetime
 from dateutil.relativedelta import relativedelta
@@ -71,6 +72,7 @@ class Budget(models.Model):
     budget_name = models.CharField(max_length=200, verbose_name='Nome do Orçamento')
     allowed_spending = models.DecimalField(decimal_places=2, max_digits=15,verbose_name='Valor')
     spent = models.DecimalField(default=0, decimal_places=2, max_digits=15)
+    budget_color = ColorField(default='#FF0000')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

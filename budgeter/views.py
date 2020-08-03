@@ -3,7 +3,7 @@ from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.utils import timezone
+from colorfield import widgets
 from django.urls import reverse, reverse_lazy
 
 from .forms import *
@@ -100,7 +100,7 @@ class DeleteBudget(LoginRequiredMixin, generic.DeleteView):
 
 class BudgetUpdate(LoginRequiredMixin, generic.UpdateView):
     model = Budget
-    fields = ['budget_name', 'allowed_spending']
+    fields = ['budget_name', 'allowed_spending', 'budget_color']
     template_name_suffix = '_update_form'
     success_url = reverse_lazy('home')
 

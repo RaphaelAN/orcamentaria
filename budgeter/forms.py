@@ -1,5 +1,5 @@
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
-from django.forms import ModelForm, ModelChoiceField, ValidationError, DateField, SelectDateWidget, Form
+from django.forms import ModelForm, ModelChoiceField, ValidationError, DateField, SelectDateWidget, Form, CharField
 from django import forms
 from datetime import date
 from .models import User, Transaction, Budget
@@ -20,7 +20,7 @@ class UserBudgetUpdateForm(UserChangeForm):
 class BudgetCreationForm(ModelForm):
     class Meta:
         model = Budget
-        fields = ('budget_name', 'allowed_spending')
+        fields = ('budget_name', 'allowed_spending', 'budget_color')
 
     def __init__(self, *args, **kwargs):
         request = kwargs.pop('request', None)

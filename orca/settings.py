@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'budgeter.apps.BudgeterConfig',
-    'crispy_forms'
+    'crispy_forms',
+    'colorfield',
 ]
 
 MIDDLEWARE = [

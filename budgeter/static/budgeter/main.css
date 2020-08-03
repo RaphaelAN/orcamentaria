@@ -5,6 +5,7 @@ body{
 .card{
     background-color: #ECFDF1;
     box-shadow: 0 1px 20px 0 rgba(0,0,0,.1);
+    border-width: thick;
 }
 
 a.custom-card,
